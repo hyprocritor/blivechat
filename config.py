@@ -58,7 +58,7 @@ class AppConfig:
         self.debug = True
         self.host = '127.0.0.1'
         self.port = 12450
-        self.database_url = 'sqlite:///data/database.db'
+        self.database_url = 'sqlite://database.db'
         self.tornado_xheaders = False
         self.loader_url = ''
         self.open_browser_at_startup = True

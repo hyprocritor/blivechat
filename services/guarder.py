@@ -1,15 +1,21 @@
 import asyncio
 import json
 import threading
+import time
 
 import aiohttp
 import sqlalchemy
 import datetime
 import logging
-
+import api
 import models.database
 import models.bilibili as bl_models
-from services.avatar import get_avatar_url_or_none, _get_avatar_url_from_web
+
+from blcsdk.models import Command, RoomKey
+from services import chat
+from services.avatar import _get_avatar_url_from_web
+
+from utils.make_message import make_text_message_data
 
 GUARD_API = ("https://api.live.bilibili.com/xlive/app-room/v2/guardTab/topListNew?roomid=<room_id>&page=<page_index>"
              "&ruid=<ru_id>&page_size=30&typ=1&platform=web")
@@ -18,7 +24,8 @@ logger = logging.getLogger(__name__)
 
 
 class Guarder:
-    def __init__(self, room_id: int, uid: int):
+    def __init__(self, room_id: int, uid: int, room_key: RoomKey):
+        self._room_key = room_key
         self._room_id = room_id
         self._uid = uid
         self.thread = threading.Thread(target=asyncio.run, args=(self.laod_guardners(),))
@@ -28,9 +35,9 @@ class Guarder:
 
     async def laod_guardners(self):
         logger.warning("start")
-        pre_url = GUARD_API.replace('<room_id>', str(self._room_id)).replace('<ru_id>', str(self._uid))
+        # pre_url = GUARD_API.replace('<room_id>', str(self._room_id)).replace('<ru_id>', str(self._uid))
         print(self._room_id, self._uid)
-        # pre_url = GUARD_API.replace('<room_id>', str(21402309)).replace('<ru_id>', str(401480763))
+        pre_url = GUARD_API.replace('<room_id>', str(10209381)).replace('<ru_id>', str(296909317))
         index = 1
         # Some magic number to handle a large number of guards
         total_page = 999999
@@ -54,6 +61,12 @@ class Guarder:
                     else:
                         index += 1
         logger.info("Load Guards Complete.")
+        chat.client_room_manager.get_room(self._room_key).send_cmd_data(Command.ADD_TEXT, make_text_message_data(
+            author_name='blivechat',
+            author_type=2,
+            content='Guarder Loaded Complete.',
+            author_level=60,
+        ))
 
     def parse_guardners(self, data):
         for guard in data:
@@ -115,4 +128,5 @@ def get_accompany_by_uname(uname: str):
 
 async def updateAvatar(uid: int):
     await _get_avatar_url_from_web(uid)
+
 

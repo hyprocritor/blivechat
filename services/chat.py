@@ -209,7 +209,7 @@ class WebLiveClient(blivedm.BLiveClient):
 
     async def init_room(self):
         res = await super().init_room()
-        Guarder(self.room_id, self.room_owner_uid)
+        Guarder(self.room_id, self.room_owner_uid, self.room_key)
         if res:
             logger.info('room=%s live client init succeeded, room_id=%d', self.room_key, self.room_id)
         else:
@@ -249,7 +249,7 @@ class OpenLiveClient(blivedm.OpenLiveClient):
     async def init_room(self):
         res = await super().init_room()
         if self.guard is None:
-            self.guard = Guarder(self.room_id, self.room_owner_uid)
+            self.guard = Guarder(self.room_id, self.room_owner_uid, self.room_key)
             self.guard.init()
         if res:
             logger.info('room=%s live client init succeeded, room_id=%d', self.room_key, self.room_id)
