@@ -115,3 +115,4 @@ def get_accompany_by_uname(uname: str):
 
 async def updateAvatar(uid: int):
     await _get_avatar_url_from_web(uid)
+

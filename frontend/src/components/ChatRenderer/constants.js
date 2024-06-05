@@ -201,3 +201,25 @@ export function getShowAuthorName(message) {
   }
   return message.authorName
 }
+
+export const accompanyRages = [
+  [Number.MIN_VALUE, 0],
+  [1, 30],
+  [31, 60],
+  [61, 180],
+  [181, 365],
+  [366, 732],
+  [733, 1097],
+  [1097, Number.MAX_VALUE]
+]
+
+export const accompanyFileNames = [
+  null,
+  'NewBie.png',
+  '1month.png',
+  '2month.png',
+  '6month.png',
+  '12month.png',
+  '24month.png',
+  '36month.png'
+]

@@ -4,8 +4,10 @@
           :class="{ member: isInMemberMessage }"
           :type="authorTypeText"
     >
-      <template>{{ accompany }}</template>
       <template>{{ authorName }}</template>
+       <img v-if="accompany>0" :src="`/static/img/accompany/${accompanyBadge}`"
+            class="style-scope yt-live-chat-author-badge-renderer" :alt="readableAuthorTypeText"
+       >
       <!-- 这里是已验证勋章 -->
       <span id="chip-badges" class="style-scope yt-live-chat-author-chip"></span>
     </span>
@@ -28,6 +30,7 @@
 <script>
 import AuthorBadge from './AuthorBadge'
 import * as constants from './constants'
+import { accompanyFileNames, accompanyRages } from "./constants"
 
 export default {
   name: 'AuthorChip',
@@ -49,6 +52,17 @@ export default {
   computed: {
     authorTypeText() {
       return constants.AUTHOR_TYPE_TO_TEXT[this.authorType]
+    },
+    accompanyBadge() {
+      for (let range in accompanyRages) {
+        const min = accompanyRages[range][0]
+        const max = accompanyRages[range][1]
+        if (min < this.accompany && this.accompany <= max) {
+          console.log("user", this.accompany, min, max)
+          return accompanyFileNames[range]
+        }
+      }
+      return null
     }
   }
 }
