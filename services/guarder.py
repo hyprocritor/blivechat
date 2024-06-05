@@ -28,9 +28,9 @@ class Guarder:
 
     async def laod_guardners(self):
         logger.warning("start")
-        # pre_url = GUARD_API.replace('<room_id>', str(self._room_id)).replace('<ru_id>', str(self._uid))
+        pre_url = GUARD_API.replace('<room_id>', str(self._room_id)).replace('<ru_id>', str(self._uid))
         print(self._room_id, self._uid)
-        pre_url = GUARD_API.replace('<room_id>', str(21402309)).replace('<ru_id>', str(401480763))
+        # pre_url = GUARD_API.replace('<room_id>', str(21402309)).replace('<ru_id>', str(401480763))
         index = 1
         # Some magic number to handle a large number of guards
         total_page = 999999
