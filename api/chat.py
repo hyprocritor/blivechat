@@ -18,6 +18,7 @@ import config
 import services.avatar
 import services.chat
 import services.translate
+from services.guarder import get_accompany
 import utils.async_io
 import utils.request
 
@@ -57,23 +58,24 @@ def make_message_body(cmd, data):
 
 
 def make_text_message_data(
-    avatar_url: str = services.avatar.DEFAULT_AVATAR_URL,
-    timestamp: int = None,
-    author_name: str = '',
-    author_type: int = 0,
-    content: str = '',
-    privilege_type: int = 0,
-    is_gift_danmaku: bool = False,
-    author_level: int = 1,
-    is_newbie: bool = False,
-    is_mobile_verified: bool = True,
-    medal_level: int = 0,
-    id_: str = None,
-    translation: str = '',
-    content_type: int = ContentType.TEXT,
-    content_type_params: list = None,
-    uid: str = '',
-    medal_name: str = '',
+        avatar_url: str = services.avatar.DEFAULT_AVATAR_URL,
+        timestamp: int = None,
+        author_name: str = '',
+        author_type: int = 0,
+        content: str = '',
+        privilege_type: int = 0,
+        is_gift_danmaku: bool = False,
+        author_level: int = 1,
+        is_newbie: bool = False,
+        is_mobile_verified: bool = True,
+        medal_level: int = 0,
+        id_: str = None,
+        translation: str = '',
+        content_type: int = ContentType.TEXT,
+        content_type_params: list = None,
+        uid: str = '',
+        medal_name: str = '',
+        accompany: int = None
 ):
     # 为了节省带宽用list而不是dict
     return [
@@ -113,6 +115,8 @@ def make_text_message_data(
         uid,
         # 17: medalName
         medal_name,
+        # 18, accompany
+        accompany
     ]
 
 
@@ -250,13 +254,13 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
 
         # 不允许自动翻译的提示
         if (
-            self.auto_translate
-            and cfg.allow_translate_rooms
-            # 身份码就不管了吧，反正配置正确的情况下不会看到这个提示
-            and self.room_key.type == services.chat.RoomKeyType.ROOM_ID
-            and self.room_key.value not in cfg.allow_translate_rooms
+                self.auto_translate
+                and cfg.allow_translate_rooms
+                # 身份码就不管了吧，反正配置正确的情况下不会看到这个提示
+                and self.room_key.type == services.chat.RoomKeyType.ROOM_ID
+                and self.room_key.value not in cfg.allow_translate_rooms
         ):
-            self.send_cmd_data(Command.ADD_TEXT, make_text_message_data(
+                self.send_cmd_data(Command.ADD_TEXT, make_text_message_data(
                 author_name='blivechat',
                 author_type=2,
                 content='Translation is not allowed in this room. Please download to use translation',
@@ -351,15 +355,15 @@ class RoomInfoHandler(api.base.ApiHandler):
     async def _get_room_info(room_id) -> Tuple[int, int]:
         try:
             async with utils.request.http_session.get(
-                dm_web_cli.ROOM_INIT_URL,
-                headers={
-                    **utils.request.BILIBILI_COMMON_HEADERS,
-                    'Origin': 'https://live.bilibili.com',
-                    'Referer': f'https://live.bilibili.com/{room_id}'
-                },
-                params={
-                    'room_id': room_id
-                }
+                    dm_web_cli.ROOM_INIT_URL,
+                    headers={
+                        **utils.request.BILIBILI_COMMON_HEADERS,
+                        'Origin': 'https://live.bilibili.com',
+                        'Referer': f'https://live.bilibili.com/{room_id}'
+                    },
+                    params={
+                        'room_id': room_id
+                    }
             ) as res:
                 if res.status != 200:
                     logger.warning('room=%d _get_room_info failed: %d %s', room_id,
@@ -380,15 +384,15 @@ class RoomInfoHandler(api.base.ApiHandler):
     async def _get_server_host_list_and_token(self, room_id) -> Tuple[dict, Optional[str]]:
         try:
             async with utils.request.http_session.get(
-                dm_web_cli.DANMAKU_SERVER_CONF_URL,
-                headers={
-                    # token会对UA签名，要使用和客户端一样的UA
-                    'User-Agent': self.request.headers.get('User-Agent', '')
-                },
-                params={
-                    'id': room_id,
-                    'type': 0
-                }
+                    dm_web_cli.DANMAKU_SERVER_CONF_URL,
+                    headers={
+                        # token会对UA签名，要使用和客户端一样的UA
+                        'User-Agent': self.request.headers.get('User-Agent', '')
+                    },
+                    params={
+                        'id': room_id,
+                        'type': 0
+                    }
             ) as res:
                 if res.status != 200:
                     logger.warning('room %d _get_server_host_list failed: %d %s', room_id,
@@ -448,6 +452,12 @@ class AvatarHandler(api.base.ApiHandler):
         self.write({'avatarUrl': avatar_url})
 
 
+class AccompanyHandler(api.base.ApiHandler):
+    async def get(self):
+        uid = int(self.get_query_argument('uname'))
+        return get_accompany(uid)
+
+
 class TextEmoticonMappingsHandler(api.base.ApiHandler):
     async def get(self):
         # 缓存1天
@@ -461,4 +471,5 @@ ROUTES = [
     (r'/api/room_info', RoomInfoHandler),
     (r'/api/avatar_url', AvatarHandler),
     (r'/api/text_emoticon_mappings', TextEmoticonMappingsHandler),
+    (r'/api/accompany', AccompanyHandler),
 ]

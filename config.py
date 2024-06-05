@@ -55,7 +55,7 @@ def get_config():
 
 class AppConfig:
     def __init__(self):
-        self.debug = False
+        self.debug = True
         self.host = '127.0.0.1'
         self.port = 12450
         self.database_url = 'sqlite:///data/database.db'

@@ -48,7 +48,7 @@ class BusinessError(Exception):
     def __init__(self, data: dict):
         super().__init__(f"code={data['code']}, message={data['message']}, request_id={data['request_id']}")
         self.data = data
-
+        print(data)
     @property
     def code(self) -> int:
         return self.data['code']

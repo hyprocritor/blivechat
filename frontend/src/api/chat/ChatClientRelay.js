@@ -156,7 +156,7 @@ export default class ChatClientRelay {
       if (contentType === CONTENT_TYPE_EMOTICON) {
         emoticon = contentTypeParams[0]
       }
-
+      console.log("client relay", data)
       let content = data[4]
       data = new chatModels.AddTextMsg({
         avatarUrl: data[0],
@@ -172,7 +172,8 @@ export default class ChatClientRelay {
         medalLevel: data[10],
         id: data[11],
         translation: data[12],
-        emoticon: emoticon
+        emoticon: emoticon,
+        accompany: data[18]
       })
       this.msgHandler.onAddText(data)
       break

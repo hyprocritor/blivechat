@@ -1,22 +1,24 @@
 <template>
   <yt-live-chat-author-chip>
-    <span id="author-name" dir="auto" class="style-scope yt-live-chat-author-chip" :class="{ member: isInMemberMessage }"
-      :type="authorTypeText"
+    <span id="author-name" dir="auto" class="style-scope yt-live-chat-author-chip"
+          :class="{ member: isInMemberMessage }"
+          :type="authorTypeText"
     >
+      <template>{{ accompany }}</template>
       <template>{{ authorName }}</template>
       <!-- 这里是已验证勋章 -->
       <span id="chip-badges" class="style-scope yt-live-chat-author-chip"></span>
     </span>
     <span id="chat-badges" class="style-scope yt-live-chat-author-chip">
       <author-badge v-if="isInMemberMessage" class="style-scope yt-live-chat-author-chip"
-        :isAdmin="false" :privilegeType="privilegeType"
+                    :isAdmin="false" :privilegeType="privilegeType"
       ></author-badge>
       <template v-else>
         <author-badge v-if="authorType === AUTHOR_TYPE_ADMIN" class="style-scope yt-live-chat-author-chip"
-          isAdmin :privilegeType="0"
+                      isAdmin :privilegeType="0"
         ></author-badge>
         <author-badge v-if="privilegeType > 0" class="style-scope yt-live-chat-author-chip"
-          :isAdmin="false" :privilegeType="privilegeType"
+                      :isAdmin="false" :privilegeType="privilegeType"
         ></author-badge>
       </template>
     </span>
@@ -36,7 +38,8 @@ export default {
     isInMemberMessage: Boolean,
     authorName: String,
     authorType: Number,
-    privilegeType: Number
+    privilegeType: Number,
+    accompany: Number,
   },
   data() {
     return {

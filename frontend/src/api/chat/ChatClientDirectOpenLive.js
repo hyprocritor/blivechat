@@ -198,7 +198,7 @@ export default class ChatClientDirectOpenLive extends ChatClientOfficialBase {
     if (data.dm_type === 1) {
       emoticon = data.emoji_img_url
     }
-
+    console.error("direct", data)
     data = new chatModels.AddTextMsg({
       avatarUrl: chat.processAvatarUrl(data.uface),
       timestamp: data.timestamp,
@@ -210,6 +210,7 @@ export default class ChatClientDirectOpenLive extends ChatClientOfficialBase {
       medalLevel: data.fans_medal_wearing_status ? data.fans_medal_level : 0,
       id: data.msg_id,
       emoticon: emoticon,
+      accompany: data.accompany,
     })
     this.msgHandler.onAddText(data)
   }

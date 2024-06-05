@@ -2,7 +2,8 @@ import axios from 'axios'
 import MD5 from 'crypto-js/md5'
 
 export function getDefaultMsgHandler() {
-  let dummyFunc = () => {}
+  let dummyFunc = () => {
+  }
   return {
     onAddText: dummyFunc,
     onAddGift: dummyFunc,
@@ -34,14 +35,30 @@ export async function getAvatarUrl(uid, username) {
 
   let res
   try {
-    res = (await axios.get('/api/avatar_url', { params: {
-      uid: uid,
-      username: username
-    } })).data
+    res = (await axios.get('/api/avatar_url', {
+      params: {
+        uid: uid,
+        username: username
+      }
+    })).data
   } catch {
     return getDefaultAvatarUrl(uid, username)
   }
   return res.avatarUrl
+}
+
+export async function getGuardAccompany(uid) {
+  let res
+  try {
+    res = (await axios.get('/api/accompany', {
+      params: {
+        uid: uid,
+      }
+    })).data
+  } catch {
+    return 0
+  }
+  return res.accompany
 }
 
 export function getDefaultAvatarUrl(uid, username) {

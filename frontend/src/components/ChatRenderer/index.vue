@@ -19,6 +19,7 @@
                 :privilegeType="message.privilegeType"
                 :richContent="getShowRichContent(message)"
                 :repeated="message.repeated"
+                :accompany="message.accompany"
               ></text-message>
               <paid-message :key="message.id" v-else-if="message.type === MESSAGE_TYPE_GIFT"
                 class="style-scope yt-live-chat-item-list-renderer"

@@ -4,6 +4,7 @@ import * as chat from '.'
 import * as chatModels from './models'
 import * as base from './ChatClientOfficialBase'
 import ChatClientOfficialBase from './ChatClientOfficialBase'
+import { getGuardAccompany } from "."
 
 export default class ChatClientDirectWeb extends ChatClientOfficialBase {
   constructor(roomId) {
@@ -23,9 +24,11 @@ export default class ChatClientDirectWeb extends ChatClientOfficialBase {
   async initRoom() {
     let res
     try {
-      res = (await axios.get('/api/room_info', { params: {
-        roomId: this.roomId
-      } })).data
+      res = (await axios.get('/api/room_info', {
+        params: {
+          roomId: this.roomId
+        }
+      })).data
     } catch {
       return true
     }
@@ -92,7 +95,7 @@ export default class ChatClientDirectWeb extends ChatClientOfficialBase {
     } else {
       authorType = 0
     }
-
+    console.error("web", command)
     let authorName = info[2][1]
     let content = info[1]
     let data = new chatModels.AddTextMsg({
@@ -108,6 +111,7 @@ export default class ChatClientDirectWeb extends ChatClientOfficialBase {
       isMobileVerified: Boolean(info[2][6]),
       medalLevel: roomId === this.roomId ? medalLevel : 0,
       emoticon: info[0][13].url || null,
+      accompany: getGuardAccompany(uid)
     })
     this.msgHandler.onAddText(data)
   }

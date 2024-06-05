@@ -266,7 +266,8 @@ export default {
         richContent: richContent,
         privilegeType: data.privilegeType,
         repeated: 1,
-        translation: data.translation
+        translation: data.translation,
+        accompany: data.accompany
       }
       this.$refs.renderer.addMessage(message)
     },

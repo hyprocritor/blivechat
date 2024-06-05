@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import asyncio
 import enum
+import json
 import logging
 import random
 import uuid
@@ -18,6 +19,7 @@ import services.plugin
 import services.translate
 import utils.async_io
 import utils.request
+from services.guarder import Guarder, get_accompany_by_uname
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +40,7 @@ class RoomKey(NamedTuple):
             # 身份码要脱敏
             res = '***' + res[-3:]
         return res
+
     __repr__ = __str__
 
     @classmethod
@@ -107,6 +110,7 @@ def make_plugin_msg_extra_from_client_room(room: 'ClientRoom'):
 
 class LiveClientManager:
     """管理到B站的连接"""
+
     def __init__(self):
         self._live_clients: Dict[RoomKey, LiveClientType] = {}
         self._close_client_futures: Set[asyncio.Future] = set()
@@ -205,6 +209,7 @@ class WebLiveClient(blivedm.BLiveClient):
 
     async def init_room(self):
         res = await super().init_room()
+        Guarder(self.room_id, self.room_owner_uid)
         if res:
             logger.info('room=%s live client init succeeded, room_id=%d', self.room_key, self.room_id)
         else:
@@ -224,6 +229,7 @@ class OpenLiveClient(blivedm.OpenLiveClient):
     HEARTBEAT_INTERVAL = 10
 
     def __init__(self, room_key: RoomKey):
+        self.guard = None
         assert room_key.type == RoomKeyType.AUTH_CODE
         cfg = config.get_config()
         super().__init__(
@@ -242,6 +248,9 @@ class OpenLiveClient(blivedm.OpenLiveClient):
 
     async def init_room(self):
         res = await super().init_room()
+        if self.guard is None:
+            self.guard = Guarder(self.room_id, self.room_owner_uid)
+            self.guard.init()
         if res:
             logger.info('room=%s live client init succeeded, room_id=%d', self.room_key, self.room_id)
         else:
@@ -448,7 +457,6 @@ class ClientRoom:
 
     def add_client(self, client: 'api.chat.ChatHandler'):
         logger.info('room=%s addding client %s', self._room_key, client.request.remote_ip)
-
         self._clients.append(client)
         if client.auto_translate:
             self._auto_translate_count += 1
@@ -504,6 +512,7 @@ class LiveMsgHandler(blivedm.BaseHandler):
         _live_client_manager.del_live_client(client.room_key)
 
     def _on_danmaku(self, client: WebLiveClient, message: dm_web_models.DanmakuMessage):
+        print("_on_danmaku")
         utils.async_io.create_task_with_ref(self.__on_danmaku(client, message))
 
     async def __on_danmaku(self, client: WebLiveClient, message: dm_web_models.DanmakuMessage):
@@ -533,7 +542,7 @@ class LiveMsgHandler(blivedm.BaseHandler):
             content_type_params = None
 
         need_translate = (
-            content_type != api.chat.ContentType.EMOTICON and self._need_translate(message.msg, room, client)
+                content_type != api.chat.ContentType.EMOTICON and self._need_translate(message.msg, room, client)
         )
         if need_translate:
             translation = services.translate.get_translation_from_cache(message.msg)
@@ -544,7 +553,8 @@ class LiveMsgHandler(blivedm.BaseHandler):
                 need_translate = False
         else:
             translation = ''
-
+        accompany = get_accompany_by_uname(message.uname)
+        print(json.dumps(message))
         msg_id = uuid.uuid4().hex
         data = api.chat.make_text_message_data(
             avatar_url=avatar_url,
@@ -565,6 +575,7 @@ class LiveMsgHandler(blivedm.BaseHandler):
             # 给插件用的字段
             uid=str(message.uid) if message.uid != 0 else message.uname,
             medal_name='' if message.medal_room_id != client.room_id else message.medal_name,
+            accompany=accompany
         )
         room.send_cmd_data(api.chat.Command.ADD_TEXT, data)
         services.plugin.broadcast_cmd_data(
@@ -697,10 +708,10 @@ class LiveMsgHandler(blivedm.BaseHandler):
     def _need_translate(text, room: ClientRoom, client: LiveClientType):
         cfg = config.get_config()
         return (
-            cfg.enable_translate
-            and room.need_translate
-            and (not cfg.allow_translate_rooms or client.room_id in cfg.allow_translate_rooms)
-            and services.translate.need_translate(text)
+                cfg.enable_translate
+                and room.need_translate
+                and (not cfg.allow_translate_rooms or client.room_id in cfg.allow_translate_rooms)
+                and services.translate.need_translate(text)
         )
 
     @staticmethod
@@ -748,7 +759,7 @@ class LiveMsgHandler(blivedm.BaseHandler):
             content_type_params = None
 
         need_translate = (
-            content_type != api.chat.ContentType.EMOTICON and self._need_translate(message.msg, room, client)
+                content_type != api.chat.ContentType.EMOTICON and self._need_translate(message.msg, room, client)
         )
         if need_translate:
             translation = services.translate.get_translation_from_cache(message.msg)
@@ -775,6 +786,7 @@ class LiveMsgHandler(blivedm.BaseHandler):
             # 给插件用的字段
             uid=message.open_id,
             medal_name='' if not message.fans_medal_wearing_status else message.fans_medal_name,
+            accompany=get_accompany_by_uname(message.uname)
         )
         room.send_cmd_data(api.chat.Command.ADD_TEXT, data)
         services.plugin.broadcast_cmd_data(
