@@ -1,5 +1,6 @@
 import asyncio
 import json
+import threading
 
 import aiohttp
 import sqlalchemy
@@ -20,15 +21,16 @@ class Guarder:
     def __init__(self, room_id: int, uid: int):
         self._room_id = room_id
         self._uid = uid
-        print(self._room_id, self._uid)
+        self.thread = threading.Thread(target=asyncio.run, args=(self.laod_guardners(),))
 
     def init(self):
-        asyncio.run(self.laod_guardners())
+        self.thread.start()
 
     async def laod_guardners(self):
         logger.warning("start")
         # pre_url = GUARD_API.replace('<room_id>', str(self._room_id)).replace('<ru_id>', str(self._uid))
-        pre_url = GUARD_API.replace('<room_id>', str(10209381)).replace('<ru_id>', str(296909317))
+        print(self._room_id, self._uid)
+        pre_url = GUARD_API.replace('<room_id>', str(21402309)).replace('<ru_id>', str(401480763))
         index = 1
         # Some magic number to handle a large number of guards
         total_page = 999999
@@ -43,23 +45,24 @@ class Guarder:
                     total_page = data['data']['info']['page']
                     index = data['data']['info']['now']
                     if index == 1:
-                        asyncio.run(self.parse_guardners(data['data']['top3']))
-                    asyncio.run(self.parse_guardners(data['data']['list']))
+                        self.parse_guardners(data['data']['top3'])
+                    self.parse_guardners(data['data']['list'])
                     print("add page " + str(index))
                     print(json.dumps(data))
                     if total_page == index:
                         break
                     else:
                         index += 1
+        logger.info("Load Guards Complete.")
 
-    async def parse_guardners(self, data):
+    def parse_guardners(self, data):
         for guard in data:
             uid = guard['uinfo']['uid']
             uname = guard['uinfo']['base']['name']
             accompany = guard['accompany']
-            await self.add_guardners_to_database(uid, accompany, uname)
+            self.add_guardners_to_database(uid, accompany, uname)
 
-    async def add_guardners_to_database(self, uid, accompany, uname):
+    def add_guardners_to_database(self, uid, accompany, uname):
         try:
             with models.database.get_session() as session:
                 user = session.scalars(
@@ -78,7 +81,6 @@ class Guarder:
                 user.accompany_updateTime = datetime.datetime.now()
                 user.uname = uname
                 session.commit()
-                asyncio.run(updateAvatar(uid))
         except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.IntegrityError) as E:
             # SQLite会锁整个文件，忽略就行。另外还有多线程导致ID重复的问题，这里对一致性要求不高就没加for update
             print(E)
