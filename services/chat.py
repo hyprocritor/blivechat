@@ -880,6 +880,7 @@ class LiveMsgHandler(blivedm.BaseHandler):
             'privilegeType': message.guard_level,
             'medalLevel': 0 if not message.fans_medal_wearing_status else message.fans_medal_level,
             'medalName': '' if not message.fans_medal_wearing_status else message.fans_medal_name,
+            'accompany': get_accompany_by_uname(message.uname)
         }
         room.send_cmd_data(api.chat.Command.ADD_SUPER_CHAT, data)
         services.plugin.broadcast_cmd_data(

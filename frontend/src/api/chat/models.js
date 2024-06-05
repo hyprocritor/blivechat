@@ -85,6 +85,7 @@ export class AddSuperChatMsg {
     price = 0,
     content = '',
     translation = '',
+    accompany = 0,
   } = {}) {
     this.id = id
     this.avatarUrl = avatarUrl
@@ -93,6 +94,7 @@ export class AddSuperChatMsg {
     this.price = price
     this.content = content
     this.translation = translation
+    this.accompany = accompany
   }
 }
 

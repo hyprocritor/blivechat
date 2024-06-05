@@ -45,6 +45,7 @@
                 :authorName="getShowAuthorName(message)"
                 :price="message.price"
                 :content="getShowContent(message)"
+                :accompany="message.accompany"
               ></paid-message>
             </template>
           </div>

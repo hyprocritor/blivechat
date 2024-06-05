@@ -331,7 +331,8 @@ export default {
         price: data.price,
         time: new Date(data.timestamp * 1000),
         content: data.content.trim(),
-        translation: data.translation
+        translation: data.translation,
+        accompany: data.accompany
       }
       this.$refs.renderer.addMessage(message)
     },

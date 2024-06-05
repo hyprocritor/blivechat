@@ -6,7 +6,7 @@
     >
       <template>{{ authorName }}</template>
        <img v-if="accompany>0" :src="`/static/img/accompany/${accompanyBadge}`"
-            class="style-scope yt-live-chat-author-badge-renderer" :alt="readableAuthorTypeText"
+            class="style-scope yt-live-chat-author-badge-renderer" :alt="accompanyBadgeReadableText"
        >
       <!-- 这里是已验证勋章 -->
       <span id="chip-badges" class="style-scope yt-live-chat-author-chip"></span>
@@ -52,6 +52,9 @@ export default {
   computed: {
     authorTypeText() {
       return constants.AUTHOR_TYPE_TO_TEXT[this.authorType]
+    },
+    accompanyBadgeReadableText() {
+      return `${this.accompany.toString()}days`
     },
     accompanyBadge() {
       for (let range in accompanyRages) {
