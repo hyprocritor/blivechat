@@ -45,7 +45,11 @@ jobs:
       - name: Build EXE
         run: |
           pyinstaller main.spec
-
+          
+      - name: Tree File Structure
+        id: tree
+        run: tree /F
+        
       - name: Zip Files
         uses: vimtor/action-zip@v1.2
         with:
