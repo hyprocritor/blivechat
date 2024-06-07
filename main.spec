@@ -3,7 +3,6 @@
 
 a = Analysis(
     ['main.py'],
-    pathex=['/Users/zhikaichen/WebstormProjects/blivechat'],
     binaries=[],
     datas=[('frontend','frontend'),('data','data'),('log','log')],
     hiddenimports=[],
@@ -26,7 +25,7 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=False,
+    console=True,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
