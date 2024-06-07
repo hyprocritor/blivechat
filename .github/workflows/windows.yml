@@ -53,13 +53,13 @@ jobs:
       - name: Zip Files
         uses: vimtor/action-zip@v1.2
         with:
-          files: blivechat/blivechat/build/main/*
-          dest: blivechat/blivechat/build/blivechat.zip
+          files: build/main
+          dest: blivechat.zip
     
       - name: Upload EXE to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: blivechat/blivechat/build/blivechat.zip  # 假设生成的EXE文件在dist目录下
+          files: blivechat.zip  # 假设生成的EXE文件在dist目录下
           tag_name: ${{ steps.date.outputs.date }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
