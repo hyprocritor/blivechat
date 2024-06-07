@@ -21,7 +21,7 @@ jobs:
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'refs/tags/${{ steps.date.outputs.date }}',
+              ref: ${{ format('{0}/{1}','refs/tags/' steps.date.outputs.date }},
               sha: context.sha
             })
           
