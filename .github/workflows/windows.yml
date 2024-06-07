@@ -28,9 +28,15 @@ jobs:
         run: |
           pyinstaller main.spec
 
+      - name: Zip Files
+        uses: vimtor/action-zip@v1.2
+        with:
+          files: dist/main/*
+          dest: dist/blivechat.zip
+
       - name: Upload EXE to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/*  # 假设生成的EXE文件在dist目录下
+          files: dist/blivechat.zip  # 假设生成的EXE文件在dist目录下
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
