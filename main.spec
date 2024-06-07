@@ -3,7 +3,6 @@
 
 a = Analysis(
     ['main.py'],
-    pathex=[],
     binaries=[],
     datas=[('frontend','frontend'),('data','data'),('log','log')],
     hiddenimports=[],
