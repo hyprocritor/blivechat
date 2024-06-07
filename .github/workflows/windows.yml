@@ -46,14 +46,14 @@ jobs:
         run: |
           pyinstaller main.spec
           
-      - name: Tree File Structure
-        id: tree
-        run: tree /F
+      # - name: Tree File Structure
+      #   id: tree
+      #   run: tree /F
         
       - name: Zip Files
         uses: vimtor/action-zip@v1.2
         with:
-          files: build/main
+          files: dist/main
           dest: blivechat.zip
     
       - name: Upload EXE to GitHub Release
