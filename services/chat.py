@@ -830,7 +830,7 @@ class LiveMsgHandler(blivedm.BaseHandler):
         room = client_room_manager.get_room(client.room_key)
         if room is None:
             return
-
+        Guarder.add_guardners_to_database(message.user_info.open_id, 1, message.user_info.uname)
         data = {
             'id': message.msg_id,
             'avatarUrl': services.avatar.process_avatar_url(message.user_info.uface),

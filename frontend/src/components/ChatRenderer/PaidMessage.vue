@@ -19,7 +19,7 @@
           <div id="header-content-primary-column" class="style-scope yt-live-chat-paid-message-renderer">
             <div>
               <div id="author-name" class="style-scope yt-live-chat-paid-message-renderer">{{ authorName }}</div>
-              <img v-if="accompany>0" :src="`/static/img/accompany/${accompanyBadge}`"
+              <img v-if="accompany>0" :src="`${accompanyBadge}`"
                    class="style-scope yt-live-chat-author-badge-renderer" :alt="accompanyBadgeReadableText"
               >
             </div>
@@ -39,7 +39,6 @@
 import ImgShadow from './ImgShadow'
 import * as constants from './constants'
 import * as utils from '@/utils'
-import { accompanyFileNames, accompanyRages } from "./constants"
 
 export default {
   name: 'PaidMessage',
@@ -54,6 +53,7 @@ export default {
     time: Date,
     content: String,
     accompany: Number,
+    guardSettingConfig: Array,
   },
   computed: {
     priceConfig() {
@@ -72,12 +72,11 @@ export default {
       return `${this.accompany.toString()}days`
     },
     accompanyBadge() {
-      for (let range in accompanyRages) {
-        const min = accompanyRages[range][0]
-        const max = accompanyRages[range][1]
-        if (min < this.accompany && this.accompany <= max) {
-          console.log("user", this.accompany, min, max)
-          return accompanyFileNames[range]
+      for (let range in this.guardSettingConfig) {
+        const config = this.guardSettingConfig[range]
+        console.log("Afdaf", config)
+        if (this.accompany > config.min && this.accompany <= config.max) {
+          return config.url
         }
       }
       return null

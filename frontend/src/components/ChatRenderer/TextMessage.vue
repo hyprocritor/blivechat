@@ -6,7 +6,7 @@
     <div id="content" class="style-scope yt-live-chat-text-message-renderer">
       <span id="timestamp" class="style-scope yt-live-chat-text-message-renderer">{{ timeText }}</span>
       <author-chip class="style-scope yt-live-chat-text-message-renderer"
-        :isInMemberMessage="false" :authorName="authorName" :authorType="authorType" :privilegeType="privilegeType" :accompany="accompany"
+        :isInMemberMessage="false" :authorName="authorName" :authorType="authorType" :privilegeType="privilegeType" :accompany="accompany" :guard-setting-config="guardSetting"
       ></author-chip>
       <span id="message" class="style-scope yt-live-chat-text-message-renderer">
         <template v-for="(content, index) in richContent">
@@ -52,12 +52,16 @@ export default {
     privilegeType: Number,
     repeated: Number,
     accompany: Number,
+    guardSetting: Array
   },
   data() {
     return {
       CONTENT_TYPE_TEXT: constants.CONTENT_TYPE_TEXT,
       CONTENT_TYPE_IMAGE: constants.CONTENT_TYPE_IMAGE
     }
+  },
+  mounted() {
+    console.log("text", this.guardSetting)
   },
   computed: {
     timeText() {

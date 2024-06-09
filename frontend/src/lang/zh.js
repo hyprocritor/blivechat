@@ -59,10 +59,15 @@ export default {
     importPresetCssTip: '自动导入服务器的CSS文件：data/custom_public/preset.css',
 
     emoticon: '自定义表情',
+    guardSetting: '舰长设置',
+    guardStartDay: '开始日期',
+    guardEndDay: '结束日期',
+    guardImgName: '图片名称',
     emoticonKeyword: '替换关键词',
     emoticonUrl: 'URL',
     operation: '操作',
     addEmoticon: '添加表情',
+    addGuardImage: '添加区间',
     emoticonFileTooLarge: '文件尺寸太大，最大1MB',
 
     urlTooLong: '房间URL太长了，会被直播姬截断（OBS不会）',

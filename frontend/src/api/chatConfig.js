@@ -1,6 +1,43 @@
 import _ from 'lodash'
 
 import { mergeConfig } from '@/utils'
+export const defaultGuardSetting = [
+  {
+    start: 0,
+    end: 30,
+    url: '/static/img/accompany/NewBie.png'
+  },
+  {
+    start: 30,
+    end: 60,
+    url: '/static/img/accompany/1month.png'
+  },
+  {
+    start: 60,
+    end: 180,
+    url: '/static/img/accompany/2month.png'
+  },
+  {
+    start: 180,
+    end: 365,
+    url: '/static/img/accompany/6month.png'
+  },
+  {
+    start: 365,
+    end: 732,
+    url: '/static/img/accompany/12month.png'
+  },
+  {
+    start: 732,
+    end: 1097,
+    url: '/static/img/accompany/24month.png'
+  },
+  {
+    start: 1097,
+    end: Number.MAX_VALUE,
+    url: '/static/img/accompany/36month.png'
+  }
+]
 
 export const DEFAULT_CONFIG = {
   minGiftPrice: 0.1,
@@ -24,9 +61,11 @@ export const DEFAULT_CONFIG = {
   autoTranslate: false,
   giftUsernamePronunciation: '',
   importPresetCss: false,
+  guardSetting: defaultGuardSetting, // [{ start: '', end: '', url: '' }, ...]
+  emoticons: [], // [{ keyword: '', url: '' }, ...]
 
-  emoticons: [] // [{ keyword: '', url: '' }, ...]
 }
+
 
 export function deepCloneDefaultConfig() {
   return _.cloneDeep(DEFAULT_CONFIG)
@@ -69,5 +108,26 @@ export function sanitizeConfig(config) {
       }
     }
   }
-  config.emoticons = newEmoticons
+  console.log("testa")
+  // deal with the guardsetting parts   like emoticons
+  let newGuardSettings = []
+  if (config.guardSetting instanceof Array) {
+    for (let guardSetting of config.guardSetting) {
+      try {
+        let newGuardSetting = {
+          start: guardSetting.keyword,
+          end: guardSetting.end,
+          url: guardSetting.url
+        }
+        console.log("test")
+        if ((typeof newGuardSetting.start !== 'number') || (typeof newGuardSetting.end !== 'number')
+          || (typeof newGuardSetting.url !== 'string')) {
+          continue
+        }
+        newGuardSettings.push(newGuardSetting)
+      } catch {
+        continue
+      }
+    }
+  }
 }

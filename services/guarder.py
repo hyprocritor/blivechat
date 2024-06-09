@@ -8,6 +8,7 @@ import sqlalchemy
 import datetime
 import logging
 import api
+import config
 import models.database
 import models.bilibili as bl_models
 
@@ -35,9 +36,12 @@ class Guarder:
 
     async def laod_guardners(self):
         logger.warning("start")
-        # pre_url = GUARD_API.replace('<room_id>', str(self._room_id)).replace('<ru_id>', str(self._uid))
+        pre_url = ""
+        if not config.get_config().debug:
+            pre_url = GUARD_API.replace('<room_id>', str(self._room_id)).replace('<ru_id>', str(self._uid))
+        else:
+            pre_url = GUARD_API.replace('<room_id>', str(10209381)).replace('<ru_id>', str(296909317))
         print(self._room_id, self._uid)
-        pre_url = GUARD_API.replace('<room_id>', str(10209381)).replace('<ru_id>', str(296909317))
         index = 1
         # Some magic number to handle a large number of guards
         total_page = 999999
@@ -75,7 +79,8 @@ class Guarder:
             accompany = guard['accompany']
             self.add_guardners_to_database(uid, accompany, uname)
 
-    def add_guardners_to_database(self, uid, accompany, uname):
+    @staticmethod
+    def add_guardners_to_database( uid, accompany, uname):
         try:
             with models.database.get_session() as session:
                 user = session.scalars(

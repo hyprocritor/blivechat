@@ -11,6 +11,9 @@ module.exports = {
       '/emoticons': {
         target: API_BASE_URL
       },
+      '/guard_image': {
+        target: API_BASE_URL
+      },
       '/custom_public': {
         target: API_BASE_URL
       },

@@ -217,6 +217,40 @@
               <el-button type="primary" icon="el-icon-plus" @click="addEmoticon">{{$t('home.addEmoticon')}}</el-button>
             </p>
           </el-tab-pane>
+
+          <el-tab-pane :label="$t('home.guardSetting')">
+            <el-table :data="form.guardSetting">
+              <el-table-column prop="start" :label="$t('home.guardStartDay')">
+                <template slot-scope="scope">
+                  <el-input-number v-model.number="scope.row.start"></el-input-number>
+                </template>
+              </el-table-column>
+              <el-table-column prop="end" :label="$t('home.guardEndDay')">
+                <template slot-scope="scope">
+                  <el-input-number v-model.number="scope.row.end"></el-input-number>
+                </template>
+              </el-table-column>
+              <el-table-column prop="url" :label="$t('home.guardImgName')">
+                <template slot-scope="scope">
+                  <el-input v-model="scope.row.url" disabled></el-input>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('home.operation')" width="170">
+                <template slot-scope="scope">
+                  <el-button-group>
+                    <el-button type="primary" icon="el-icon-upload2" :disabled="!serverConfig.enableUploadFile"
+                               @click="uploadGuardImage(scope.row)"
+                    ></el-button>
+                    <el-button type="danger" icon="el-icon-minus" @click="delGuardImage(scope.$index)"></el-button>
+                  </el-button-group>
+                </template>
+              </el-table-column>
+            </el-table>
+            <p>
+              <el-button type="primary" icon="el-icon-plus" @click="addGuardImage">{{$t('home.addGuardImage')}}</el-button>
+            </p>
+          </el-tab-pane>
+
         </el-tabs>
       </el-form>
     </p>
@@ -300,6 +334,7 @@ export default {
   watch: {
     unvalidatedRoomUrl: 'updateRoomUrl',
     roomUrl: _.debounce(function(val, oldVal) {
+      console.log("log")
       // 提示用户URL已更新
       // 如果语言不是默认的中文，则刷新页面时也会有一次提示，没办法
       if (val !== '' && oldVal !== '') {
@@ -349,9 +384,43 @@ export default {
         url: ''
       })
     },
+    addGuardImage() {
+      this.form.guardSetting.push({
+        start: 0,
+        end: 1,
+        url: ''
+      })
+    },
+    delGuardImage(index) {
+      this.form.guardSetting.splice(index, 1)
+    },
     delEmoticon(index) {
       this.form.emoticons.splice(index, 1)
     },
+
+    uploadGuardImage(guardSetting) {
+      let input = document.createElement('input')
+      input.type = 'file'
+      input.accept = 'image/png, image/jpeg, image/jpg, image/gif'
+      input.onchange = async() => {
+        let file = input.files[0]
+        if (file.size > 1024 * 1024) {
+          this.$message.error(this.$t('home.emoticonFileTooLarge'))
+          return
+        }
+
+        let res
+        try {
+          res = await mainApi.uploadGuardImage(file)
+        } catch (e) {
+          this.$message.error(`Failed to upload: ${e}`)
+          console.log(e)
+        }
+        guardSetting.url = res.url
+      }
+      input.click()
+    },
+
     uploadEmoticon(emoticon) {
       let input = document.createElement('input')
       input.type = 'file'
@@ -388,7 +457,8 @@ export default {
       }
       let backFields = {
         lang: this.$i18n.locale,
-        emoticons: JSON.stringify(this.form.emoticons)
+        emoticons: JSON.stringify(this.form.emoticons),
+        guardSetting: JSON.stringify(this.form.guardSetting)
       }
       let ignoredNames = new Set(['roomId', 'authCode'])
       let query = { ...frontFields }

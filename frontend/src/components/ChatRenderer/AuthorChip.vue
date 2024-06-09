@@ -5,7 +5,7 @@
           :type="authorTypeText"
     >
       <template>{{ authorName }}</template>
-       <img v-if="accompany>0" :src="`/static/img/accompany/${accompanyBadge}`"
+       <img v-if="accompany>0 && accompanyBadge!=null" :src="`${accompanyBadge}`"
             class="style-scope yt-live-chat-author-badge-renderer" :alt="accompanyBadgeReadableText"
        >
       <!-- 这里是已验证勋章 -->
@@ -30,7 +30,6 @@
 <script>
 import AuthorBadge from './AuthorBadge'
 import * as constants from './constants'
-import { accompanyFileNames, accompanyRages } from "./constants"
 
 export default {
   name: 'AuthorChip',
@@ -43,6 +42,7 @@ export default {
     authorType: Number,
     privilegeType: Number,
     accompany: Number,
+    guardSettingConfig: Array,
   },
   data() {
     return {
@@ -57,12 +57,13 @@ export default {
       return `${this.accompany.toString()}days`
     },
     accompanyBadge() {
-      for (let range in accompanyRages) {
-        const min = accompanyRages[range][0]
-        const max = accompanyRages[range][1]
-        if (min < this.accompany && this.accompany <= max) {
-          console.log("user", this.accompany, min, max)
-          return accompanyFileNames[range]
+      console.log("chip", this.guardSettingConfig)
+      for (let range in this.guardSettingConfig) {
+
+        const config = this.guardSettingConfig[range]
+        console.log("range", config.start, config.end, config.url)
+        if (this.accompany > config.start && this.accompany <= config.end) {
+          return config.url
         }
       }
       return null

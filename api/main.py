@@ -16,9 +16,13 @@ EMOTICON_UPLOAD_PATH = os.path.join(config.DATA_PATH, 'emoticons')
 EMOTICON_BASE_URL = '/emoticons'
 CUSTOM_PUBLIC_PATH = os.path.join(config.DATA_PATH, 'custom_public')
 
+GUARD_LEVEL_PATH = os.path.join(config.DATA_PATH)
+GUARD_LEVEL_BASE_URL = '/guard_image'
+
 
 class MainHandler(tornado.web.StaticFileHandler):
     """为了使用Vue Router的history模式，把不存在的文件请求转发到index.html"""
+
     async def get(self, path, include_body=True):
         if path == '':
             await self._get_index(include_body)
@@ -87,6 +91,40 @@ class UploadEmoticonHandler(api.base.ApiHandler):
         return f'{EMOTICON_BASE_URL}/{filename}'
 
 
+class UploadGuardImageHandler(api.base.ApiHandler):
+    async def post(self):
+        cfg = config.get_config()
+        if not cfg.enable_upload_file:
+            raise tornado.web.HTTPError(403)
+        try:
+            file = self.request.files['file'][0]
+        except LookupError:
+            raise tornado.web.MissingArgumentError('file')
+        if len(file.body) > 1024 * 1024:
+            raise tornado.web.HTTPError(413, 'file is too large, size=%d', len(file.body))
+        if not file.content_type.lower().startswith('image/'):
+            raise tornado.web.HTTPError(415)
+
+        url = await asyncio.get_running_loop().run_in_executor(
+            None, self._save_file, file.body, self.request.remote_ip
+        )
+        self.write({'url': url})
+
+    @staticmethod
+    def _save_file(body, client):
+        md5 = hashlib.md5(body).hexdigest()
+        filename = md5 + '.png'
+        path = os.path.join(GUARD_LEVEL_PATH, filename)
+        logger.info('client=%s uploaded file, path=%s, size=%d', client, path, len(body))
+
+        tmp_path = path + '.tmp'
+        with open(tmp_path, 'wb') as f:
+            f.write(body)
+        os.replace(tmp_path, path)
+
+        return f'{GUARD_LEVEL_BASE_URL}/{filename}'
+
+
 class NoCacheStaticFileHandler(tornado.web.StaticFileHandler):
     def set_extra_headers(self, path):
         self.set_header('Cache-Control', 'no-cache')
@@ -95,10 +133,12 @@ class NoCacheStaticFileHandler(tornado.web.StaticFileHandler):
 ROUTES = [
     (r'/api/server_info', ServerInfoHandler),
     (r'/api/emoticon', UploadEmoticonHandler),
+    (r'/api/guard_image', UploadGuardImageHandler),
 ]
 # 通配的放在最后
 LAST_ROUTES = [
     (rf'{EMOTICON_BASE_URL}/(.*)', tornado.web.StaticFileHandler, {'path': EMOTICON_UPLOAD_PATH}),
+    (rf'{GUARD_LEVEL_BASE_URL}/(.*)', tornado.web.StaticFileHandler, {'path': GUARD_LEVEL_PATH}),
     # 这个目录不保证文件内容不会变，还是不用缓存了
     (r'/custom_public/(.*)', NoCacheStaticFileHandler, {'path': CUSTOM_PUBLIC_PATH}),
     (r'/(.*)', MainHandler, {'path': config.WEB_ROOT}),

@@ -20,6 +20,7 @@
                 :richContent="getShowRichContent(message)"
                 :repeated="message.repeated"
                 :accompany="message.accompany"
+                :guard-setting="guardSetting"
               ></text-message>
               <paid-message :key="message.id" v-else-if="message.type === MESSAGE_TYPE_GIFT"
                 class="style-scope yt-live-chat-item-list-renderer"
@@ -46,6 +47,7 @@
                 :price="message.price"
                 :content="getShowContent(message)"
                 :accompany="message.accompany"
+                :guard-setting-config="guardSetting"
               ></paid-message>
             </template>
           </div>
@@ -97,6 +99,10 @@ export default {
     showGiftName: {
       type: Boolean,
       default: chatConfig.DEFAULT_CONFIG.showGiftName
+    },
+    guardSetting: {
+      type: Array,
+      default: chatConfig.defaultGuardSetting
     }
   },
   data() {
@@ -140,6 +146,7 @@ export default {
     }
   },
   mounted() {
+    console.log("chat-renderer mounted", this.guardSetting)
     this.scrollToBottom()
   },
   beforeDestroy() {

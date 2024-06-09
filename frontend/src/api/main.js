@@ -9,3 +9,10 @@ export async function uploadEmoticon(file) {
   body.set('file', file)
   return (await axios.post('/api/emoticon', body)).data
 }
+
+
+export async function uploadGuardImage(file) {
+  let body = new FormData()
+  body.set('file', file)
+  return (await axios.post('/api/guard_image', body)).data
+}

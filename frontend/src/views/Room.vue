@@ -1,5 +1,5 @@
 <template>
-  <chat-renderer ref="renderer" :maxNumber="config.maxNumber" :showGiftName="config.showGiftName"></chat-renderer>
+  <chat-renderer ref="renderer" :maxNumber="config.maxNumber" :showGiftName="config.showGiftName" :guard-setting="config.guardSetting"></chat-renderer>
 </template>
 
 <script>
@@ -144,20 +144,21 @@ export default {
       })
     },
     initConfig() {
-      let locale = this.strConfig.lang
+      const strConfig = JSON.parse(localStorage.getItem("config"))
+      let locale = strConfig.locale
       if (locale) {
         i18n.setLocale(locale)
       }
 
       let cfg = {}
       // 留空的使用默认值
-      for (let i in this.strConfig) {
-        if (this.strConfig[i] !== '') {
-          cfg[i] = this.strConfig[i]
+      for (let i in strConfig) {
+        if (strConfig[i] !== '') {
+          cfg[i] = strConfig[i]
         }
       }
       cfg = mergeConfig(cfg, chatConfig.deepCloneDefaultConfig())
-
+      console.log(cfg)
       cfg.minGiftPrice = toFloat(cfg.minGiftPrice, chatConfig.DEFAULT_CONFIG.minGiftPrice)
       cfg.showDanmaku = toBool(cfg.showDanmaku)
       cfg.showGift = toBool(cfg.showGift)
@@ -178,6 +179,7 @@ export default {
       cfg.importPresetCss = toBool(cfg.importPresetCss)
 
       cfg.emoticons = this.toObjIfJson(cfg.emoticons)
+      cfg.guardSetting = this.toObjIfJson(cfg.guardSetting)
 
       chatConfig.sanitizeConfig(cfg)
       this.config = cfg

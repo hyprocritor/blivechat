@@ -77,5 +77,7 @@ module.exports = {
     "no-console": "off", // 线上尽量不要用console输出，看不到的
 
     "vue/multi-word-component-names": "off", // Vue组件名允许用1个单词
+
+    "no-debugger": "off", // 线上尽量不要用debugger，看不到的
   }
 }
