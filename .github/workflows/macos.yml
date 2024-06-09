@@ -75,7 +75,7 @@ jobs:
       - name: Upload EXE to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: blivechat.zip  # 假设生成的EXE文件在dist目录下
+          files: blivechat-macos.zip  # 假设生成的EXE文件在dist目录下
           tag_name: ${{ steps.date.outputs.date }}
           name: ${{ steps.vars.outputs.sha_short }}
 
