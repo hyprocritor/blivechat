@@ -1,4 +1,4 @@
-name: Build and Release EXE
+name: Build and Release MacOS Version
 
 on:
   workflow_dispatch:
@@ -70,7 +70,7 @@ jobs:
         uses: vimtor/action-zip@v1.2
         with:
           files: dist/main
-          dest: blivechat.zip
+          dest: blivechat-macos.zip
     
       - name: Upload EXE to GitHub Release
         uses: softprops/action-gh-release@v1

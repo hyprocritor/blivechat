@@ -70,7 +70,7 @@ jobs:
         uses: vimtor/action-zip@v1.2
         with:
           files: dist/main
-          dest: blivechat.zip
+          dest: blivechat-windows.zip
 
       - name: Upload EXE to GitHub Release
         uses: softprops/action-gh-release@v1
