@@ -61,7 +61,10 @@ jobs:
       # - name: Tree File Structure
       #   id: tree
       #   run: tree /F
-        
+      - name: Copy Data Dirs
+        run: |
+          cp -r data dist/main
+
       - name: Zip Files
         uses: vimtor/action-zip@v1.2
         with:

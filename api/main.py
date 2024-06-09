@@ -16,7 +16,7 @@ EMOTICON_UPLOAD_PATH = os.path.join(config.DATA_PATH, 'emoticons')
 EMOTICON_BASE_URL = '/emoticons'
 CUSTOM_PUBLIC_PATH = os.path.join(config.DATA_PATH, 'custom_public')
 
-GUARD_LEVEL_PATH = os.path.join(config.DATA_PATH)
+GUARD_LEVEL_PATH = os.path.join(config.DATA_PATH, "guard_image")
 GUARD_LEVEL_BASE_URL = '/guard_image'
 
 
