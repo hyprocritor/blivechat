@@ -43,6 +43,7 @@ jobs:
           pip install pyinstaller
 
       - name: Setup NodeJS
+        uses: actions/setup-node@v4.0.2
         with:
           node-version: '20.14.0'
 
