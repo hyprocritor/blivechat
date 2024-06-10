@@ -4,7 +4,7 @@
 a = Analysis(
     ['main.py'],
     binaries=[],
-    datas=[('frontend','frontend'),('data','data'),('log','log')],
+    datas=[('frontend/dist','frontend/dist'),('data','data'),('log','log')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
